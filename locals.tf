@@ -164,7 +164,7 @@ locals {
   
   # Determine Datadog target region
   datadog_target_region = var.datadog.enabled ? (
-    var.datadog.region_override != null ? var.datadog.region_override : var.cluster_region
+    var.datadog.region_override != null ? var.datadog.region_override : var.region
   ) : ""
   
   # Validate Datadog region is supported
@@ -203,9 +203,9 @@ locals {
   # Derive Temporal supported regions from the service names map
   temporal_supported_regions = keys(local.temporal_service_names)
   
-  # Get the appropriate Temporal service name (must match cluster region)
+  # Get the appropriate Temporal service name (must match region)
   temporal_service_name = var.temporal.enabled ? (
-    lookup(local.temporal_service_names, var.cluster_region, "")
+    lookup(local.temporal_service_names, var.region, "")
   ) : ""
   
   # Determine which service is enabled

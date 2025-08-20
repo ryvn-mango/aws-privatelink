@@ -15,12 +15,12 @@ This Terraform module creates AWS PrivateLink endpoints for connecting to extern
 ### Datadog
 - **Regions**: us-east-1, ap-northeast-1, ap-southeast-2
 - **Endpoints**: Up to 10 different service endpoints (logs, metrics, API, traces, etc.)
-- **Cross-Region**: Supported (can connect to Datadog in a different region than your cluster)
+- **Cross-Region**: Supported (can connect to Datadog in a different region)
 
 ### Temporal
 - **Regions**: 14 regions globally (us-east-1, us-west-2, eu-west-1, etc.)
 - **Endpoints**: Single endpoint for workflow orchestration
-- **Cross-Region**: Not supported (must match cluster region)
+- **Cross-Region**: Not supported (must match specified region)
 
 ### Supabase
 - **Regions**: Any region (requires VPC Lattice Resource Configuration ARN)
@@ -35,7 +35,7 @@ This Terraform module creates AWS PrivateLink endpoints for connecting to extern
 module "datadog_privatelink" {
   source = "./aws-privatelink"
   
-  cluster_region    = "us-west-2"
+  region            = "us-west-2"
   vpc_id            = "vpc-123456"
   subnet_ids        = ["subnet-abc", "subnet-def"]
   security_group_id = "sg-123456"
@@ -44,7 +44,7 @@ module "datadog_privatelink" {
     enabled = true
     # Optional: specify endpoints (defaults to all)
     endpoints = ["logs_agent", "metrics", "api"]
-    # Optional: override region if cluster is not in a Datadog region
+    # Optional: override region if not in a supported Datadog region
     region_override = "us-east-1"
   }
 }
@@ -61,7 +61,7 @@ output "datadog_logs_dns" {
 module "temporal_privatelink" {
   source = "./aws-privatelink"
   
-  cluster_region    = "us-west-2"
+  region            = "us-west-2"
   vpc_id            = "vpc-123456"
   subnet_ids        = ["subnet-abc", "subnet-def"]
   security_group_id = "sg-123456"
@@ -83,7 +83,7 @@ output "temporal_dns" {
 module "supabase_privatelink" {
   source = "./aws-privatelink"
   
-  cluster_region    = "us-west-2"
+  region            = "us-west-2"
   vpc_id            = "vpc-123456"
   subnet_ids        = ["subnet-abc", "subnet-def"]
   security_group_id = "sg-123456"
@@ -123,7 +123,7 @@ output "supabase_dns" {
 
 | Name | Description | Type | Required |
 |------|-------------|------|----------|
-| `cluster_region` | AWS region where the cluster is located | `string` | Yes |
+| `region` | AWS region where the resources are located | `string` | Yes |
 | `vpc_id` | VPC ID where endpoints will be created | `string` | Yes |
 | `subnet_ids` | List of subnet IDs for endpoint placement | `list(string)` | Yes |
 | `security_group_id` | Security group ID to attach to endpoints | `string` | Yes |
@@ -140,7 +140,7 @@ output "supabase_dns" {
 datadog = {
   enabled         = bool                # Enable Datadog endpoints
   endpoints       = list(string)        # Optional: specific endpoints (defaults to all)
-  region_override = string              # Optional: override region if cluster not in Datadog region
+  region_override = string              # Optional: override region if not in a supported Datadog region
 }
 ```
 
@@ -172,8 +172,8 @@ supabase = {
 
 1. **Exactly one service must be enabled** - Cannot enable multiple services in the same module instance
 2. **Region compatibility**:
-   - Datadog: Cluster must be in a supported region or provide `region_override`
-   - Temporal: Cluster must be in a supported Temporal region
+   - Datadog: Region must be supported or provide `region_override`
+   - Temporal: Region must be a supported Temporal region
    - Supabase: No region restrictions
 3. **Required configurations**:
    - Datadog: At least one endpoint must be specified or defaults to all
@@ -183,8 +183,8 @@ supabase = {
 
 ### Cross-Region Connectivity
 
-- **Datadog**: Automatically detects when cross-region is needed based on cluster region and region_override
-- **Temporal**: Does not support cross-region; endpoint must be in the same region as your cluster
+- **Datadog**: Automatically detects when cross-region is needed based on region and region_override
+- **Temporal**: Does not support cross-region; endpoint must be in the same region as specified
 - **Supabase**: Uses VPC Lattice Resource Configuration specific to your setup
 
 ### DNS Resolution
@@ -204,13 +204,13 @@ For production environments, always:
 
 ### Multi-Region Datadog Setup
 
-If your cluster is in `eu-west-1` but Datadog PrivateLink is only available in specific regions:
+If your resources are in `eu-west-1` but Datadog PrivateLink is only available in specific regions:
 
 ```hcl
 module "datadog_privatelink" {
   source = "./aws-privatelink"
   
-  cluster_region    = "eu-west-1"
+  region            = "eu-west-1"
   vpc_id            = "vpc-123456"
   subnet_ids        = ["subnet-abc", "subnet-def"]
   security_group_id = "sg-123456"
@@ -230,7 +230,7 @@ To create only specific Datadog endpoints instead of all:
 module "datadog_privatelink" {
   source = "./aws-privatelink"
   
-  cluster_region    = "us-east-1"
+  region            = "us-east-1"
   vpc_id            = "vpc-123456"
   subnet_ids        = ["subnet-abc", "subnet-def"]
   security_group_id = "sg-123456"
@@ -250,7 +250,7 @@ module "datadog_privatelink" {
 
 2. **"Region not supported"**: 
    - For Datadog: Use `region_override` to specify a supported region
-   - For Temporal: Ensure your cluster is in a supported region
+   - For Temporal: Ensure your region is supported
 
 3. **"Connection timeout"**: 
    - Verify security group allows traffic on the correct port

@@ -1,5 +1,10 @@
-variable "cluster_region" {
-  description = "The AWS region where the cluster is located"
+variable "name_prefix" {
+  description = "Prefix to use for resource names"
+  type        = string
+}
+
+variable "region" {
+  description = "The AWS region where the resources are located"
   type        = string
 }
 
@@ -84,12 +89,6 @@ variable "tags" {
   description = "A map of tags to apply to all resources"
   type        = map(string)
   default     = {}
-}
-
-variable "name_prefix" {
-  description = "Prefix to use for resource names"
-  type        = string
-  default     = ""
 }
 
 # Validation to ensure only one provider is enabled
