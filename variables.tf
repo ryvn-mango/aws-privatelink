@@ -53,7 +53,7 @@ variable "datadog" {
   }
   
   validation {
-    condition = !var.datadog.enabled || var.datadog.region_override == null || (var.datadog.region_override != null && contains(local.datadog_supported_regions, var.datadog.region_override))
+    condition = !var.datadog.enabled || (var.datadog.region_override == null ? true : contains(local.datadog_supported_regions, var.datadog.region_override))
     error_message = "Datadog region_override must be one of: ${join(", ", local.datadog_supported_regions)}"
   }
 }
