@@ -40,7 +40,7 @@ resource "aws_vpc_endpoint" "temporal" {
   vpc_endpoint_type   = "Interface"
   subnet_ids          = var.subnet_ids
   security_group_ids  = [var.security_group_id]
-  private_dns_enabled = true
+  private_dns_enabled = false
 
   tags = merge(
     local.common_tags,
