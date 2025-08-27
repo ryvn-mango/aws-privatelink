@@ -67,6 +67,7 @@ resource "aws_vpc_endpoint" "supabase" {
   vpc_endpoint_type          = "Resource"
   subnet_ids                 = var.subnet_ids
   security_group_ids         = [var.security_group_id]
+  private_dns_enabled        = true
 
   tags = merge(
     local.common_tags,
