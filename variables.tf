@@ -33,7 +33,7 @@ variable "datadog" {
   default = {
     enabled = false
   }
-  
+
   validation {
     condition = !var.datadog.enabled || alltrue([
       for endpoint in coalesce(var.datadog.endpoints, []) : contains([
@@ -51,9 +51,9 @@ variable "datadog" {
     ])
     error_message = "Invalid Datadog endpoint specified. Valid values are: logs_agent, logs_user, api, metrics, containers, process, profiling, traces, database_monitoring, remote_configuration"
   }
-  
+
   validation {
-    condition = !var.datadog.enabled || (var.datadog.region_override == null ? true : contains(local.datadog_supported_regions, var.datadog.region_override))
+    condition     = !var.datadog.enabled || (var.datadog.region_override == null ? true : contains(local.datadog_supported_regions, var.datadog.region_override))
     error_message = "Datadog region_override must be one of: ${join(", ", local.datadog_supported_regions)}"
   }
 }
@@ -78,9 +78,9 @@ variable "supabase" {
     enabled                    = false
     resource_configuration_arn = ""
   }
-  
+
   validation {
-    condition = !var.supabase.enabled || (var.supabase.resource_configuration_arn != null && var.supabase.resource_configuration_arn != "")
+    condition     = !var.supabase.enabled || (var.supabase.resource_configuration_arn != null && var.supabase.resource_configuration_arn != "")
     error_message = "Supabase resource_configuration_arn must be provided when Supabase is enabled"
   }
 }
@@ -98,7 +98,7 @@ locals {
     var.temporal.enabled ? "temporal" : "",
     var.supabase.enabled ? "supabase" : ""
   ])
-  
+
   enabled_providers_count = length(local.enabled_providers)
 }
 

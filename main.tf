@@ -78,3 +78,10 @@ resource "aws_vpc_endpoint" "supabase" {
     }
   )
 }
+
+# Data source to get the VPC Lattice association DNS details for Supabase
+data "aws_vpc_endpoint_associations" "supabase" {
+  count = var.supabase.enabled ? 1 : 0
+
+  vpc_endpoint_id = aws_vpc_endpoint.supabase[0].id
+}
