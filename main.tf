@@ -21,7 +21,7 @@ resource "aws_vpc_endpoint" "datadog" {
       CrossRegion  = local.datadog_target_region != var.region ? "true" : "false"
     }
   )
-  
+
   lifecycle {
     precondition {
       condition     = local.datadog_region_valid
@@ -49,7 +49,7 @@ resource "aws_vpc_endpoint" "temporal" {
       Region = var.region
     }
   )
-  
+
   lifecycle {
     precondition {
       condition     = contains(local.temporal_supported_regions, var.region)
@@ -62,12 +62,11 @@ resource "aws_vpc_endpoint" "temporal" {
 resource "aws_vpc_endpoint" "supabase" {
   count = var.supabase.enabled ? 1 : 0
 
-  vpc_id              = var.vpc_id
-  service_name        = var.supabase.resource_configuration_arn
-  vpc_endpoint_type   = "Interface"
-  subnet_ids          = var.subnet_ids
-  security_group_ids  = [var.security_group_id]
-  private_dns_enabled = true
+  vpc_id                     = var.vpc_id
+  resource_configuration_arn = var.supabase.resource_configuration_arn
+  vpc_endpoint_type          = "Resource"
+  subnet_ids                 = var.subnet_ids
+  security_group_ids         = [var.security_group_id]
 
   tags = merge(
     local.common_tags,
