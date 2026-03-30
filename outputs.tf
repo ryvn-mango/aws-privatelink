@@ -13,9 +13,11 @@ output "endpoint" {
   description = "PrivateLink endpoint with DNS name"
   value = var.temporal.enabled && length(aws_vpc_endpoint.temporal) > 0 ? {
     dns_name = try(aws_vpc_endpoint.temporal[0].dns_entry[0].dns_name, "")
+    address  = try("${aws_vpc_endpoint.temporal[0].dns_entry[0].dns_name}:7233", "")
     } : (
     var.supabase.enabled && length(aws_vpc_endpoint.supabase) > 0 ? {
       dns_name = try(data.aws_vpc_endpoint_associations.supabase[0].associations[0].dns_entry[0].dns_name, "")
+      address  = try(data.aws_vpc_endpoint_associations.supabase[0].associations[0].dns_entry[0].dns_name, "")
     } : null
   )
 }
